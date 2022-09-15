@@ -3,7 +3,7 @@ from tortoise.models import Model
 
 
 class Node(Model):
-    id = fields.UUIDField(pk=True)
+    id = fields.CharField(pk=True, max_length=100)
     type = fields.CharField(max_length=10)
     parent = fields.ForeignKeyField(
         model_name="models.Node",
