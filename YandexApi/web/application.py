@@ -20,7 +20,7 @@ def get_app() -> FastAPI:
     app = FastAPI(
         title="YandexApi",
         description="Task For SHBR",
-        version=metadata.version("YandexApi"),
+        version="0.1.0",
         docs_url="/api/docs",
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",

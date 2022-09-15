@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     # Variables for the database
-    db_url:str = "sqlite://production-database.sqlite3"
+    db_url: str = "sqlite://production-database.sqlite3"
     db_echo: bool = False
 
     class Config:
