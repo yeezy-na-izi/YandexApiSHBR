@@ -1,120 +1,125 @@
-from fastapi import APIRouter
+from datetime import datetime
+
+from fastapi import APIRouter, HTTPException
 from tortoise.exceptions import DoesNotExist
 
-from YandexApi.db.models import Node
+from YandexApi.db.models import Node, NodeHistory
 from YandexApi.web.api.imports.schema import ImportNodeSchema
 
 router = APIRouter()
 
 
-@router.post("/imports", status_code=200)
-async def imports_nodes(
-    import_value: ImportNodeSchema,
-) -> dict:
-    """
-    {
-        "items": [
-            {
-                "type": "FOLDER",
-                "id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
-                "parentId": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1"
-            },
-            {
-                "type": "FILE",
-                "url": "/file/url3",
-                "id": "98883e8f-0507-482f-bce2-2fb306cf6483",
-                "parentId": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
-                "size": 512
-            },
-            {
-                "type": "FILE",
-                "url": "/file/url4",
-                "id": "74b81fda-9cdc-4b63-8927-c978afed5cf4",
-                "parentId": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
-                "size": 1024
-            }
-        ],
-        "updateDate": "2022-02-03T12:00:00Z"
-    }
-    """
+@router.post("/imports")
+async def imports_nodes(import_value: ImportNodeSchema):
+    """Import nodes"""
+    # check date format
+    try:
+        datetime.fromisoformat(import_value.updateDate[:-1])
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Validation Failed")
+
     parents_for_update = set()
+
     try:
         for item in import_value.items:
+
+            # check parent or set None
             if item.parentId:
                 parent = await Node.get(id=item.parentId)
                 if parent.type == "FILE":
-                    return {
-                        "code": 400,
-                        "message": "Validation Failed",
-                    }
+                    raise HTTPException(status_code=400, detail="Validation Failed")
                 parents_for_update.add(item.parentId)
             else:
                 parent = None
 
+            # create or update node
             try:
-                node = await Node.get(id=item.id)
-                if node.type != item.type:
-                    return {
-                        "code": 400,
-                        "message": "Validation Failed",
-                    }
-
-                if item.type == "FILE":
-                    if item.size < 1:
-                        return {
-                            "code": 400,
-                            "message": "Validation Failed",
-                        }
-
-                node.parent = parent
-                node.date = import_value.updateDate
-                await node.update_from_dict(
-                    {
-                        "type": item.type,
-                        "parent": parent,
-                        "size": item.size if item.type == "FILE" else None,
-                        "url": item.url if item.type == "FILE" else None,
-                        "date": import_value.updateDate,
-                    },
-                )
+                folder_id = await update_node(item, import_value.updateDate, parent)
             except DoesNotExist:
-                if item.type == "FOLDER":
-                    await Node.create(
-                        id=item.id,
-                        type=item.type,
-                        parent=parent,
-                        date=import_value.updateDate,
-                    )
-                else:
-                    if item.size < 1:
-                        return {
-                            "code": 400,
-                            "message": "Validation Failed",
-                        }
-                    await Node.create(
-                        id=item.id,
-                        type=item.type,
-                        parent=parent,
-                        size=item.size,
-                        url=item.url,
-                        date=import_value.updateDate,
-                    )
-
+                folder_id = await create_node(item, import_value.updateDate, parent)
             except Exception as e:
+                raise HTTPException(status_code=400, detail="Validation Failed")
 
-                print("Что за херь?", e)
+            if folder_id:
+                parents_for_update.add(folder_id)
 
+        # update date for parents and create history
         for parent_id in parents_for_update:
             await update_date_for_folders(parent_id, import_value.updateDate)
-        print()
-        return {
-            "code": 200,
-        }
-    except Exception:
-        return {
-            "code": 400,
-            "message": "Validation Failed",
-        }
+
+    except Exception as e:
+        # raise e
+        raise HTTPException(status_code=400, detail="Validation Failed")
+
+
+async def update_node(item, date, parent):
+    node = await Node.get(id=item.id)
+    if node.type != item.type:
+        raise HTTPException(status_code=400, detail="Validation Failed")
+
+    if item.type == "FILE":
+        if item.size < 1:
+            raise HTTPException(status_code=400, detail="Validation Failed")
+
+    await node.update_from_dict(
+        {
+            "type": item.type,
+            "parent": parent,
+            "size": item.size if item.type == "FILE" else None,
+            "url": item.url if item.type == "FILE" else None,
+            "date": date,
+        },
+    )
+    await node.save()
+    if node.type == "FILE":
+        size = item.size
+        await NodeHistory.create(
+            node=node,
+            type=node.type,
+            parent=node.parent,
+            size=size,
+            url=node.url,
+            date=node.date,
+        )
+        return None
+    else:
+        return node.id
+
+
+async def create_node(item, date, parent):
+    if item.type == "FOLDER":
+        node = await Node.create(
+            id=item.id,
+            type=item.type,
+            parent=parent,
+            date=date,
+        )
+    else:
+        if item.size < 1:
+            raise HTTPException(status_code=400, detail="Validation Failed")
+
+        node = await Node.create(
+            id=item.id,
+            type=item.type,
+            parent=parent,
+            size=item.size,
+            url=item.url,
+            date=date,
+        )
+
+    if node.type == "FILE":
+        size = item.size
+        await NodeHistory.create(
+            node=node,
+            type=node.type,
+            parent=node.parent,
+            size=size,
+            url=node.url,
+            date=node.date,
+        )
+        return None
+    else:
+        return node.id
 
 
 async def update_date_for_folders(node_id: str, date):
@@ -126,5 +131,27 @@ async def update_date_for_folders(node_id: str, date):
     )
     await node.save(update_fields=["date"])
 
+    try:
+        await NodeHistory.get(node_id=node.id, date=node.date)
+    except DoesNotExist:
+        await NodeHistory.create(
+            node=node,
+            type=node.type,
+            parent=await Node.get(id=node.parent_id) if node.parent_id else None,
+            size=await get_size_for_folder(node.id),
+            url=node.url,
+            date=node.date,
+        )
+
     if node.parent:
         await update_date_for_folders(node.parent_id, date)
+
+
+async def get_size_for_folder(node_id: str):
+    size = 0
+    for node in await Node.filter(parent_id=node_id):
+        if node.type == "FILE":
+            size += node.size
+        else:
+            size += await get_size_for_folder(node.id)
+    return size
