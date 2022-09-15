@@ -22,4 +22,6 @@ RUN pip install pytz
 COPY . /app/src/
 RUN poetry install
 
+RUN ls -la
+
 CMD ["/usr/local/bin/python", "-m", "YandexApi"]
