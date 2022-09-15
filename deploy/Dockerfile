@@ -17,6 +17,7 @@ RUN poetry install
 
 # Install pytz
 RUN pip install pytz
+RUN pip install aerich
 
 # Copying actuall application
 COPY . /app/src/
