@@ -109,3 +109,4 @@ exclude =
   ./var,
   ./.vscode,
   *migrations*,
+  ./enrollment,

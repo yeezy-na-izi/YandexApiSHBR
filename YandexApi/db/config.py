@@ -1,16 +1,13 @@
-from typing import List
-
-from YandexApi.settings import settings
-
-MODELS_MODULES: List[str] = []  # noqa: WPS407
+MODELS_PATH = "YandexApi.db.models."
+MODELS_MODULES: list[str] = [MODELS_PATH + model for model in ["node"]]  # noqa: WPS407
 
 TORTOISE_CONFIG = {  # noqa: WPS407
     "connections": {
-        "default": str(settings.db_url),
+        "default": "sqlite://production-database.sqlite3",
     },
     "apps": {
         "models": {
-            "models": MODELS_MODULES,
+            "models": MODELS_MODULES + ["aerich.models"],
             "default_connection": "default",
         },
     },
