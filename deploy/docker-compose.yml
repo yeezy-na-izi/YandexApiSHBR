@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./deploy/Dockerfile
+    ports:
+      - "80:80"
     image: yandex_api:${YANDEXAPI_VERSION:-latest}
     restart: always
     env_file:
