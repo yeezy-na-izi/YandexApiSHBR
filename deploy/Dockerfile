@@ -26,3 +26,4 @@ RUN poetry install
 RUN ls -la
 
 CMD ["/usr/local/bin/python", "-m", "YandexApi"]
+EXPOSE 80
