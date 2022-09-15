@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "YandexApi"
+name = "yandex_api"
 version = "0.1.0"
 description = "Task For SHBR"
 authors = [

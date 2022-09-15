@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./deploy/Dockerfile
-    image: YandexApi:${YANDEXAPI_VERSION:-latest}
+    image: yandex_api:${YANDEXAPI_VERSION:-latest}
     restart: always
     env_file:
     - .env
@@ -13,10 +13,10 @@ services:
       YANDEXAPI_HOST: 0.0.0.0
       YANDEXAPI_DB_FILE: /db_data/db.sqlite3
     volumes:
-    - YandexApi-db-data:/db_data/
+    - yandex_api-db-data:/db_data/
 
 
 
 volumes:
-  YandexApi-db-data:
-    name: YandexApi-db-data
+  yandex-api-db-data:
+    name: yandex-api-db-data
