@@ -5,22 +5,15 @@ RUN pip install poetry==1.1.13
 # Configuring poetry
 RUN poetry config virtualenvs.create false
 
-RUN cd /home
-RUN ls -la
-
 # Copying requirements of a project
 COPY pyproject.toml poetry.lock /app/src/
 WORKDIR /app/src
 
+# Installing requirements
+RUN poetry install
 
-# Installing dependencies
-RUN python3 -m pip install -r /home/ubuntu/YandexApiSHBR/requirements.txt
-
-## Installing requirements
-#RUN poetry install
-
-## Copying actuall application
-#COPY . /app/src/
-#RUN poetry install
+# Copying actuall application
+COPY . /app/src/
+RUN poetry install
 
 CMD ["/usr/local/bin/python", "-m", "YandexApi"]
