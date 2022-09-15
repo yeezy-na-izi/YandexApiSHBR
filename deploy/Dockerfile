@@ -12,6 +12,9 @@ WORKDIR /app/src
 # Installing requirements
 RUN poetry install
 
+# Install pytz
+RUN pip install pytz
+
 # Copying actuall application
 COPY . /app/src/
 RUN poetry install
