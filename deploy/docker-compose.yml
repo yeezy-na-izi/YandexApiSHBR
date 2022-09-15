@@ -13,7 +13,7 @@ services:
       YANDEXAPI_HOST: 0.0.0.0
       YANDEXAPI_DB_FILE: /db_data/db.sqlite3
     volumes:
-    - yandex_api-db-data:/db_data/
+    - yandex-api-db-data:/db_data/
 
 
 
