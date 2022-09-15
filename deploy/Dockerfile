@@ -5,11 +5,12 @@ RUN pip install poetry==1.1.13
 # Configuring poetry
 RUN poetry config virtualenvs.create false
 
+RUN ls -la
+
 # Copying requirements of a project
 COPY pyproject.toml poetry.lock /app/src/
 WORKDIR /app/src
 
-RUN ls
 
 # Installing dependencies
 RUN python3 -m pip install -r /app/src/requirements.txt
