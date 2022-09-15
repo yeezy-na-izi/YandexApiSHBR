@@ -15,8 +15,8 @@ RUN python3 -m pip install -r requirements.txt
 ## Installing requirements
 #RUN poetry install
 
-# Copying actuall application
-COPY . /app/src/
-RUN poetry install
+## Copying actuall application
+#COPY . /app/src/
+#RUN poetry install
 
 CMD ["/usr/local/bin/python", "-m", "YandexApi"]
