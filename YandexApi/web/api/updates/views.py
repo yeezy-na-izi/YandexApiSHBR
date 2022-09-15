@@ -23,12 +23,12 @@ async def get_output(date):
         date = pytz.utc.localize(datetime.fromisoformat(date))
     except ValueError:
         raise HTTPException(status_code=400, detail="Validation Failed")
+
     output = []
     try:
         nodes = await Node.filter(type="FILE")
         left_date = date - timedelta(days=1)
         for node in nodes:
-
             if left_date <= node.date <= date:
                 output.append(
                     {
@@ -40,6 +40,7 @@ async def get_output(date):
                         "date": str(node.date).replace("+00:00", "Z").replace(" ", "T"),
                     }
                 )
+
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Item not found")
 

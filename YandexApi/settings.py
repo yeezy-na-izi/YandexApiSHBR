@@ -40,20 +40,8 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     # Variables for the database
-    db_file: Path = TEMP_DIR / "db.sqlite3"
+    db_url:str = "sqlite://production-database.sqlite3"
     db_echo: bool = False
-
-    @property
-    def db_url(self) -> URL:
-        """
-        Assemble database URL from settings.
-
-        :return: database URL.
-        """
-        return URL.build(
-            scheme="sqlite",
-            path=f"///{self.db_file}",
-        )
 
     class Config:
         env_file = ".env"

@@ -19,6 +19,7 @@ async def imports_nodes(import_value: ImportNodeSchema):
         raise HTTPException(status_code=400, detail="Validation Failed")
 
     parents_for_update = set()
+    import_value.items.sort(key=lambda x: x.type, reverse=True)
 
     try:
         for item in import_value.items:
@@ -47,8 +48,7 @@ async def imports_nodes(import_value: ImportNodeSchema):
         for parent_id in parents_for_update:
             await update_date_for_folders(parent_id, import_value.updateDate)
 
-    except Exception as e:
-        # raise e
+    except Exception:
         raise HTTPException(status_code=400, detail="Validation Failed")
 
 

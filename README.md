@@ -1,7 +1,9 @@
 # YandexApi
 
-This project was generated using fastapi_template.
-
+## First step
+```bash
+pip install poerty
+```
 ## Poetry
 
 This project uses poetry. It's a modern dependency management
@@ -86,26 +88,6 @@ YANDEXAPI_ENVIRONMENT="dev"
 ```
 
 You can read more about BaseSettings class here: https://pydantic-docs.helpmanual.io/usage/settings/
-
-## Pre-commit
-
-To install pre-commit simply run inside the shell:
-```bash
-pre-commit install
-```
-
-pre-commit is very useful to check your code before publishing it.
-It's configured using .pre-commit-config.yaml file.
-
-By default it runs:
-* black (formats your code);
-* mypy (validates types);
-* isort (sorts imports in all files);
-* flake8 (spots possibe bugs);
-* yesqa (removes useless `# noqa` comments).
-
-
-You can read more about pre-commit here: https://pre-commit.com/
 
 
 ## Running tests
