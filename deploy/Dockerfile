@@ -9,8 +9,10 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock /app/src/
 WORKDIR /app/src
 
+RUN ls
+
 # Installing dependencies
-RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install -r /app/src/requirements.txt
 
 ## Installing requirements
 #RUN poetry install
