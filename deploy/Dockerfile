@@ -13,7 +13,7 @@ WORKDIR /app/src
 
 
 # Installing dependencies
-RUN python3 -m pip install -r /app/src/requirements.txt
+RUN python3 -m pip install -r /home/ubuntu/YandexApiSHBR/requirements.txt
 
 ## Installing requirements
 #RUN poetry install
