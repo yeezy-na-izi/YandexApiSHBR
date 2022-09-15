@@ -9,6 +9,9 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock /app/src/
 WORKDIR /app/src
 
+# Update pip
+RUN python -m pip install --upgrade pip
+
 # Installing requirements
 RUN poetry install
 
