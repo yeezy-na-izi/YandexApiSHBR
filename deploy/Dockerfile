@@ -9,11 +9,14 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock /app/src/
 WORKDIR /app/src
 
-# Installing requirements
-RUN poetry install
+# Installing dependencies
+RUN python3 -m pip install setuptools
 
 # Install PYTZ
 RUN pip install pytz
+
+# Installing requirements
+RUN poetry install
 
 # Copying actuall application
 COPY . /app/src/
