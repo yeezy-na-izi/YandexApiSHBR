@@ -10,13 +10,10 @@ COPY pyproject.toml poetry.lock /app/src/
 WORKDIR /app/src
 
 # Installing dependencies
-RUN python3 -m pip install setuptools
+RUN python3 -m pip install -r requirements.txt
 
-# Install PYTZ
-RUN pip install pytz
-
-# Installing requirements
-RUN poetry install
+## Installing requirements
+#RUN poetry install
 
 # Copying actuall application
 COPY . /app/src/
